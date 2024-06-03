@@ -8,7 +8,7 @@ from sklearn.preprocessing import StandardScaler
 
 def process_audio(audio, file_path):
     # Perform wavelet transform
-    wavelet_coeffs = pywt.wavedec(audio, 'db1')
+    wavelet_coeffs = pywt.wavedec(audio, 'db2') # For better resolution, use 'db3' or higher
 
     # Standardize the readings
     scaler = StandardScaler()
