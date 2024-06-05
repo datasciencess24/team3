@@ -11,10 +11,10 @@ class TimeSeriesCNN(nn.Module):
 
     def _build_model(self):
         self.conv1 = nn.Sequential(
-            nn.Conv1d(in_channels=5, out_channels=32, kernel_size=32),  # 使用的是1维卷积层
+            nn.Conv1d(in_channels=5, out_channels=32, kernel_size=32), 
             nn.BatchNorm1d(32),
             nn.ReLU(),
-            nn.MaxPool1d(kernel_size=8)  # 用于降维 注意区分max pooling（最大值池化）和卷积核的操作区别：池化作用于图像中不重合的区域（这与卷积操作不同）
+            nn.MaxPool1d(kernel_size=8)  
         )
 
         self.conv2 = nn.Sequential(
