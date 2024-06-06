@@ -68,24 +68,3 @@ def parse_args():
                         help="if it has timeseries_Conv_model.")
 
     return parser.parse_args()
-
-
-
-# class Config():
-#     def __init__(self):
-#         # data_path = '../data/data1/train/power.csv'
-#         self.num_embeddings = 23 # number of catergory of the embedidng
-#         self.embedding_dim = 32
-#         #self.n_samples = 58
-#         #self.timestep = 14  # 时间步长，就是利用多少时间窗口
-#         self.batch_size = 5  # 批次大小 since for trainning we only have 58 data
-#         self.feature_size = 46  # 每个步长对应的特征数量，这里只使用1维，每天的风速
-#         self.hidden_size = 56  # 隐层大小
-#         self.output_size = 3  # 由于是单输出任务，最终输出层大小为1，预测未来1天风速
-#         self.num_layers = 1  # cnn的层数
-#         self.num_epochs = 10  # 迭代轮数
-#         self.best_loss = 0  # 记录损失
-#         self.learning_rate = 0.00003  # 学习率
-#         self.dropout = 0.01
-#         self.model_name = 'cnn'
-#         self.save_path = './{}.pth'.format(model_name)  # 最优模型保存路径
