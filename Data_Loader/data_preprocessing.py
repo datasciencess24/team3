@@ -19,9 +19,7 @@ class Data_Preprocess:
         print(wavelet_coeffs.shape)
         print(wavelet_coeffs)
         wavelet_coeffs=wavelet_coeffs.reshape(wavelet_coeffs.shape[0],wavelet_coeffs.shape[2],wavelet_coeffs.shape[1])
-        print(wavelet_coeffs.shape)
-        #reshaped_data = np.squeeze(wavelet_coeffs, axis=1) #reshpe the data
-        #unwrapped_data = np.array([[np.array(timeseries) for timeseries in sublist] for sublist in reshaped_data]) # unwrap the data from the list
+        print(wavelet_coeffs.shape)t
         scaler = StandardScaler()  # nomarlize data
         processed_audio = np.array([[scaler.fit_transform(np.array(row).reshape(-1, 1)).flatten() for row in coeffs]
                                       for coeffs in wavelet_coeffs]) #shape (N,F,L)
