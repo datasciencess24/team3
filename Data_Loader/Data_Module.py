@@ -34,9 +34,9 @@ class DataModule:
             for file in self.files:
                 f = os.path.join(file_path , file)
                 print(f)
-                feature = pd.read_parquet(f, engine='fastparquet').iloc[:50]
+                feature = pd.read_parquet(f, engine='fastparquet')
                 features = pd.concat([features, feature], axis=1)
-            dataset.append(features)  # the length is how many data we have
+            dataset.append(features) 
             self.dataset = dataset
         return dataset
 
