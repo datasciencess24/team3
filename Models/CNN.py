@@ -22,7 +22,7 @@ class TimeSeriesCNN(nn.Module):
 
         self.conv2 = nn.Sequential(
             nn.Conv1d(in_channels=256, out_channels=64, kernel_size=4),
-            nn.BatchNorm1d(256),
+            nn.BatchNorm1d(64),
             nn.ReLU(),
             nn.MaxPool1d(kernel_size=int((self.sequence_length - 32)/8 - 4 + 1))
         )
