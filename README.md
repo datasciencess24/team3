@@ -32,7 +32,7 @@
 ## Data
 
 The training data consists of 29 normal ('OK') and 29 anomalous ('NOK') datapoints, given in the data folder.
-
+Here we only uploaded part of the data as samples.
 
 ## Project status
 
