@@ -20,30 +20,14 @@ def parse_args():
     parser.add_argument('--seed', type=int, default=2022,
                         help='random seed for initialization')
     # CNN
-    parser.add_argument('--gat', action='store_true',
-                        help='GAT')
-    parser.add_argument('--gat_our', action='store_true',
-                        help='GAT_our')
-    parser.add_argument('--gat_attention_type', type=str, choices=['linear', 'dotprod', 'gcn'], default='dotprod',
-                        help='The attention used for gat')
-    parser.add_argument('--embedding_dim', type=int, default=43,
-                        help='Dimension of glove embeddings')
-    parser.add_argument('--relation_num', type=int, default=3,
-                        help='Total number of relation between nodes')
-    parser.add_argument('--dep_relation_embed_dim', type=int, default=43,
-                        help='Dimension for dependency relation embeddings.')
-    parser.add_argument('--hidden_size', type=int, default=43,
-                        help='Hidden size of bilstm, in early stage.')
-    parser.add_argument('--final_hidden_size', type=int, default=43,
-                        help='Hidden size of bilstm, in early stage.')
+    parser.add_argument('--hidden_size', type=int, default=256,
+                        help='Hidden size of cnn, in early stage.')
+    parser.add_argument('--final_hidden_size', type=int, default=64,
+                        help='Hidden size of cnn, in early stage.')
     parser.add_argument('--num_mlps', type=int, default=2,
                         help='Number of mlps in the last of model.')
 
     # Training parameters
-    # parser.add_argument("--per_gpu_train_batch_size", default=60, type=int,
-    #                     help="Batch size per GPU/CPU for training.")
-    # parser.add_argument("--per_gpu_eval_batch_size", default=32, type=int,
-    #                     help="Batch size per GPU/CPU for evaluation.")
     parser.add_argument("--train_batch_size", default=5, type=int,
                         help="Batch Size for trainning")
     parser.add_argument("--splits", default=0.6, type=int,
