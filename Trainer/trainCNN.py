@@ -2,7 +2,6 @@ import torch
 import os
 import argparse
 from torch.nn.utils.rnn import pad_sequence
-import json
 import logging
 import torch.nn as nn
 import torch.nn.functional as F
