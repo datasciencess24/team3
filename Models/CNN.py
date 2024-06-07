@@ -39,7 +39,7 @@ class TimeSeriesCNN(nn.Module):
         x = self.conv2(x)
         output_feature = x
         print(output_feature.shape)
-        x = x.view(-1, 40)  # Flatten the tensor
+        x = x.view(-1, 64)  # Flatten the tensor
         print(x.shape)
         x = self.mlp(x)
         print(x.shape)
