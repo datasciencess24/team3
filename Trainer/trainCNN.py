@@ -32,7 +32,7 @@ def train_timeseries_Conv(train_dataset, device, args, sequence_length):
         correct = 0
         total = 0
         for i, (images, labels) in enumerate(train_dataset): 
-            if (i + 1) % 2 == 0:  # 99，199，299，399...
+            if (i + 1) % 100 == 0:  # 99，199，299，399...
                 print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'
                       .format(epoch + 1, num_epochs, i + 1, total_step, loss.item()))
                 images = images.to(device)
