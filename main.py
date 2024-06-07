@@ -24,15 +24,13 @@ if __name__ == '__main__':
     args = parse_args()
     longest_raw_data = 0
     # First, load the data from the dataset
+
     OK_raw_data, l1= DataModule(args.datasetOK_root,args)._load_data()
     NOK_raw_data, l2= DataModule(args.datasetNOK_root, args)._load_data()
     longest_raw_data = l1 if l1 >= l2 else l2
-    print(l1,l2)
-    #print(OK_raw_data)
-    #print(len(OK_raw_data))
-    #Second, preprocessing the data
+
+    # Second, preprocessing the dataset
     OK_dataset = Data_Preprocess(OK_raw_data).process_signal(OK_raw_data,args.datasetOK_root)
-    #print(OK_dataset.tensors[0].shape)
     NOK_dataset = Data_Preprocess(NOK_raw_data).process_signal(NOK_raw_data,args.datasetNOK_root)
     # # Concatenate the features and labels
     combined_features = torch.cat([OK_dataset.tensors[0], NOK_dataset.tensors[0]], dim=0)
@@ -41,10 +39,7 @@ if __name__ == '__main__':
     combined_dataset = TensorDataset(combined_features, combined_labels)
     combined_dataloader = DataLoader(combined_dataset, batch_size=args.train_batch_size, collate_fn = collate_fn, shuffle=True)
 
-
-
     # Third, train the CNN to get the model
-    #train_loader = torch.utils.data.DataLoader(dataset=train_dataset, batch_size=batch_size, shuffle=False)
     os.environ["CUDA_VISIBLE_DEVICES"] = args.cuda_id
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     args.device = device
@@ -55,5 +50,6 @@ if __name__ == '__main__':
 
     # Put the embedding feature into decision tree to classify
     result = TimeSeriesDT([embed_features,combined_labels],args)
+    print(result)
 
 
