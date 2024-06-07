@@ -11,7 +11,7 @@
 
 ## Structure
 
-/Data Loader:  includes  methods for loading data and preprocessing them
+**/Data Loader**:  includes  methods for loading data and preprocessing them
 - /Config.py: stores all the parameters, such as the model hyperparameters, training parameters and configuration parameters.
 - /Data_Module.py: handles loading data for use in a PyTorch model. It includes functionalities for reading data from multiple files, concatenating them into a single DataFrame, and preparing them for training with a custom collate function.
 - /Dataset.py: Customized structure of the time series dataset
