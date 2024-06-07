@@ -20,7 +20,7 @@
 
 **/Models** contains both of our models that will be trained and tested both jointly and separately
 
-/Trainer includes all methods that are used to train the models
+**/Trainer** includes all methods that are used to train the models
 - /trainCNN.py: train a Convolutional Neural Network (CNN) model on time series data using PyTorch. It includes functionalities for training the model, and saving the trained model.
 
 **/Data** contains both the data-files that are classified as ok and those that are classified as not-ok
