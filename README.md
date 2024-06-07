@@ -12,14 +12,18 @@
 ## Structure
 
 /Data_Loader includes
+
 /Models contains both of our models that will be trained and tested both jointly and separately
+
 /Trainer includes
+
 /Data contains both the data-files that are classified as ok and those that are classified as not-ok
+
 main.py
 
 ## Data
 
-The training date consits of 29 normal/ok data-sets and 29 not-ok data-sets, given in the data folder
+The training date consits of 29 normal/ok data-sets and 29 not-ok data-sets, given in the data folder.
 
 ## Project status
 This project still is not finished and classified as work in progress
