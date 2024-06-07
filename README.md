@@ -4,9 +4,9 @@
 
 ## Overview
 
-- Our explainable fusion model for grinding anomaly detection allows for observed anomalies to be more easily linked to their root causes in real time, striking the ideal balance between accuracy, interpretability and efficiency.  
-- It comprises a convolutional neural network (CNN) and decision tree (DT).
-- Our experiments demonstrate that this fusion model performs significantly better than other explainable alternatives, namely a parallel CNN-DT fusion model, CNN with heat map, DT used alone and regularised logistic regression.
+Here you can find our explainable fusion model for grinding-anomaly-detection. It allows for observed anomalies to be more easily linked to their root causes in real time, striking the ideal balance between accuracy, interpretability and efficiency.<br>
+It comprises a convolutional neural network (CNN) and decision tree (DT).<br>
+Our experiments demonstrate that this fusion model performs significantly better than other explainable alternatives, namely a parallel CNN-DT fusion model, CNN with heat map, DT used alone and regularised logistic regression.
 
 
 ## Structure
