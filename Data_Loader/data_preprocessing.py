@@ -16,10 +16,7 @@ class Data_Preprocess:
 
     def process_signal(self,data, file_path):
         wavelet_coeffs = pywt.wavedec(data, 'db2')[0]  # get the array from the list (N,F,L)
-        print(wavelet_coeffs.shape)
-        print(wavelet_coeffs)
         wavelet_coeffs=wavelet_coeffs.reshape(wavelet_coeffs.shape[0],wavelet_coeffs.shape[2],wavelet_coeffs.shape[1])
-        print(wavelet_coeffs.shape)t
         scaler = StandardScaler()  # nomarlize data
         processed_audio = np.array([[scaler.fit_transform(np.array(row).reshape(-1, 1)).flatten() for row in coeffs]
                                       for coeffs in wavelet_coeffs]) #shape (N,F,L)
