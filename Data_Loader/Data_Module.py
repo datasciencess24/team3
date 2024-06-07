@@ -18,7 +18,7 @@ class DataModule:
     def __init__(self, data_root, args):
         self.data_root = data_root
         self.folder = os.listdir(self.data_root)
-        self.files = ['raw/Sampling2000KHz_AEKi-0.parquet', 'raw/Sampling100KHz_Irms_Grinding-Grinding spindle current L1-Grinding spindle current L2-Grinding spindle current L3-0.parquet']
+        self.files = ['Sampling2000KHz_AEKi-0.parquet', 'Sampling100KHz_Irms_Grinding-Grinding spindle current L1-Grinding spindle current L2-Grinding spindle current L3-0.parquet']
         self.args = args
 
 
