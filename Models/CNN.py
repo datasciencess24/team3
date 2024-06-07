@@ -38,11 +38,8 @@ class TimeSeriesCNN(nn.Module):
         x = self.conv1(x)
         x = self.conv2(x)
         output_feature = x
-        print(output_feature.shape)
         x = x.view(-1, 64)  # Flatten the tensor
-        print(x.shape)
         x = self.mlp(x)
-        print(x.shape)
         return F.log_softmax(x, dim=1)
 
     def get_embed(self, x): # used for get the feature
