@@ -11,17 +11,17 @@
 
 ## Structure
 
-/Data Loader:  includes  methods for loading data and preprocessingthem
-    /Config.py: stores all the parameters, such as the model hyperparameters, training parameters and configuration parameters.
-	/Data_Module.py: handles loading data for use in a PyTorch model. It includes functionalities for reading data from multiple files, concatenating them into a single DataFrame, and preparing them for training with a custom collate function.
-    /Dataset.py: Customized structure of the time series dataset
-    /data_preprocessing.py: Handles the preprocessing of time series data using wavelet transformation and standardization. It includes functionalities for reading data, applying wavelet decomposition, standardizing the data, and converting it to a PyTorch Tensordataset
+/Data Loader:  includes  methods for loading data and preprocessing them\
+- /Config.py: stores all the parameters, such as the model hyperparameters, training parameters and configuration parameters.
+- /Data_Module.py: handles loading data for use in a PyTorch model. It includes functionalities for reading data from multiple files, concatenating them into a single DataFrame, and preparing them for training with a custom collate function.
+- /Dataset.py: Customized structure of the time series dataset
+- /data_preprocessing.py: Handles the preprocessing of time series data using wavelet transformation and standardization. It includes functionalities for reading data, applying wavelet decomposition, standardizing the data, and converting it to a PyTorch Tensordataset
 
 
 /Models contains both of our models that will be trained and tested both jointly and separately
 
-/Trainer includes all methods that are used to train the models
-    /trainCNN.py: train a Convolutional Neural Network (CNN) model on time series data using PyTorch. It includes functionalities for training the model, and saving the trained model.
+/Trainer includes all methods that are used to train the models\
+- /trainCNN.py: train a Convolutional Neural Network (CNN) model on time series data using PyTorch. It includes functionalities for training the model, and saving the trained model.
 
 /Data contains both the data-files that are classified as ok and those that are classified as not-ok
 
