@@ -30,23 +30,23 @@ def train_timeseries_Conv(train_dataset, device, args, sequence_length):
     for epoch in range(num_epochs):  
         correct = 0
         total = 0
-        for i, (images, labels) in enumerate(train_dataset): 
+        for i, (series, labels) in enumerate(train_dataset): 
             if (i + 1) % 100 == 0:  # 99，199，299，399...
                 print('Epoch [{}/{}], Step [{}/{}], Loss: {:.4f}'
                       .format(epoch + 1, num_epochs, i + 1, total_step, loss.item()))
-                images = images.to(device)
+                series = series.to(device)
                 labels = labels.to(device)
-                outputs = model(images)  
+                outputs = model(series)  
                 predicted = outputs.max(dim=1)[1]
                 total += labels.size(0)  
                 correct += (predicted == labels).sum().item()  
 
                 print('Valid Accuracy of the model on the valid dataset: {} %'.format(100 * correct / total))
             else:
-                images,labels = images.to(device),labels.to(device)
+                series,labels = series.to(device),labels.to(device)
                 labels = labels.long()
                 # Forward pass
-                outputs = model(images)
+                outputs = model(series)
                 loss = criterion(outputs, labels) 
                 # Backward and optimize
                 optimizer.zero_grad()
