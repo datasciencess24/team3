@@ -13,8 +13,6 @@ grinding_ok_full = [(var_ae, var_cur, energy_ae, energy_cur, 'normal', 'grinding
 
 all_data = grinding_nok_full + dressing_full + grinding_ok_full # Without two grinding outliers
 
-
-
 def TimeSeriesDT(data, args, max_depth): # Arguments to specify input data, train-test split and maximum depth of tree
     # Separate features and labels
     X = np.array([features for features, label in data])
@@ -28,18 +26,48 @@ def TimeSeriesDT(data, args, max_depth): # Arguments to specify input data, trai
     
     print(len(y_train))  # N
 
-    DT = DecisionTreeClassifier(max_depth = max_depth)  # gini
+    DT = DecisionTreeClassifier(max_depth = max_depth)  # Gini impurity used here
+    
+    start_time_train = time.time() # Start timing for training
     DT.fit(X_train, y_train)
+    end_time_train = time.time() # End timing for training
+
+    start_time_inference = time.time() # Start timing for inference
     y_pred = DT.predict(X_test)
+    end_time_inference = time.time() # End timing for inference
     print(len(y_pred))
     accuracy = accuracy_score(y_test, y_pred)
     print("Accuracy:", accuracy)
 
+    # Calculate and print training time
+    training_time = end_time_train - start_time_train
+    print(f"Training Time: {training_time} seconds")
+    
+    # Calculate and print inference time
+    inference_time = end_time_inference - start_time_inference
+    print(f"Inference Time: {inference_time} seconds")
+    
     result = compute_metrics(y_pred, y_test)
     print(result)
     return result
 
-# Assuming compute_metrics and acc_and_f1 are defined as before
+# Helper functions
+def acc_and_f1(preds, labels):
+    f1 = f1_score(y_true=labels, y_pred=preds, average='macro')
+    pre = precision_score(y_true=labels,y_pred=preds,average='macro',zero_division=1)
+    recall = recall_score(y_true=labels,y_pred = preds,average='macro')
+    print("F1",f1)
+    print("precision",pre)
+    print("recall",recall)
+    return {
+        "f1": f1,
+        "precision":pre,
+        "recall":recall
+    }
+
+
+def compute_metrics(preds, labels):
+    return acc_and_f1(preds, labels)
 
 # Data
 all_data_dt = [((var_ae, var_cur, energy_ae, energy_cur), condition) for var_ae, var_cur, energy_ae, energy_cur, condition, process in all_data]
@@ -52,3 +80,4 @@ args = Args(splits=0.6)
 
 # Call the function with the corrected data preparation
 TimeSeriesDT(all_data_dt, args, 1)
+
