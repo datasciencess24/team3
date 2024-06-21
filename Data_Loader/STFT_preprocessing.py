@@ -72,7 +72,7 @@ def extract_features(signal, fs, segment_index):
             print(f"Error computing features: {e}")
     return features
 
-def process_files(file1, file2, window_length, hop_length):
+def process_files(file1, file2, window_length=1024, hop_length=512): # Default window and hop length
     """Process a pair of files to extract features for each window segment."""
     try:
         data1 = pd.read_parquet(file1).to_numpy()
@@ -102,7 +102,7 @@ def process_files(file1, file2, window_length, hop_length):
         print(f"Error processing files {file1} and {file2}: {e}")
         return None
 
-def process_directory(top_directory, window_length, hop_length):
+def process_directory(top_directory, window_length=1024, hop_length=512):
     start_time = time.time()
     results = []
     corrupted_folders = []
@@ -122,10 +122,8 @@ def process_directory(top_directory, window_length, hop_length):
     return results, corrupted_folders, runtime
 
 # Example usage
-top_directory = 'Test_202402-6'
-window_length = 1024  # Example window length
-hop_length = 512  # Example hop length
-results, corrupted_folders = process_directory(top_directory, window_length, hop_length)
+top_directory = 'Data/NOK_Measurements'
+results, corrupted_folders, runtime = process_directory(top_directory)
 
 # Writing results to JSON
 output_filename = f"{top_directory}.json"
