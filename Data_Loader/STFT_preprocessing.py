@@ -23,8 +23,6 @@ Skipping Invalid Data: Subfolders with corrupted files or mismatched window coun
 This script provides a structured approach to processing the recordings, extracting, and normalizing the required features, and handling exceptions gracefully.
 '''
 
-# ChatGPT
-
 import os
 import pandas as pd
 import numpy as np
@@ -36,43 +34,11 @@ from pathlib import Path
 def compress_channels(data):
     """Compress multiple channels into one by averaging."""
     compressed_data = np.mean(data, axis=1)
-    print(f"After compressing channels, data shape: {compressed_data.shape}")  # Diagnostic print
     return compressed_data
 
-def extract_features(signal, fs):
-    """Extract specified features from a signal, adjusting for signal length."""
-    # Ensure signal is a 1D array
+def extract_features(signal, fs, segment_index):
+    """Extract specified features from a signal segment."""
     signal = np.squeeze(signal)
-    print(f"Signal shape before feature extraction: {signal.shape}")  # Diagnostic print
-    
-    # Check if signal is empty or contains NaN values
-    if signal.size == 0 or np.isnan(signal).any():
-        print("Signal is empty or contains NaN values. Using default feature values.")
-        return {
-            'spectral_centroid': 0,
-            'spectral_bandwidth': 0,
-            'spectral_flatness': 0,
-            'spectral_rolloff': 0,
-            'variance_of_spectrogram': 0,
-            'rms_of_energy': 0,
-            'zero_crossing_rate': 0
-        }
-    
-    n_fft = 1024
-    if len(signal) < n_fft:
-        # Pad signal if it's shorter than n_fft
-        signal = np.pad(signal, (0, max(0, n_fft - len(signal))), mode='constant')
-        print(f"Signal padded to length: {len(signal)}")  # Diagnostic print
-
-    # Attempt to compute the Short-Time Fourier Transform (STFT) of the signal
-    try:
-        S = np.abs(librosa.stft(signal, n_fft=n_fft, hop_length=max(1, n_fft // 2)))
-        print(f"Spectrogram shape: {S.shape}")  # Diagnostic print
-    except ValueError as e:
-        print(f"Error computing STFT: {e}")
-        S = np.array([])  # Use an empty array as a fallback
-    
-    # Initialize a dictionary to hold feature values, defaulting to 0
     features = {
         'spectral_centroid': 0,
         'spectral_bandwidth': 0,
@@ -80,99 +46,90 @@ def extract_features(signal, fs):
         'spectral_rolloff': 0,
         'variance_of_spectrogram': 0,
         'rms_of_energy': 0,
-        'zero_crossing_rate': 0
+        'zero_crossing_rate': 0,
+        'segment_index': segment_index
     }
-    
-    # Check if S is valid for feature extraction
+    if signal.size == 0 or np.isnan(signal).any():
+        return features
+    n_fft = 1024
+    if len(signal) < n_fft:
+        signal = np.pad(signal, (0, max(0, n_fft - len(signal))), mode='constant')
+    try:
+        S = np.abs(librosa.stft(signal, n_fft=n_fft, hop_length=max(1, n_fft // 2)))
+    except ValueError as e:
+        print(f"Error computing STFT: {e}")
+        return features
     if S.size > 0 and not np.isnan(S).any():
         try:
-            print("Extracting spectral_centroid...")
-            spectral_centroid = librosa.feature.spectral_centroid(S=S, sr=fs)
-            print(f"spectral_centroid shape: {spectral_centroid.shape}")
-            features['spectral_centroid'] = np.mean(spectral_centroid) if spectral_centroid.size > 0 else 0
-            
-            print("Extracting spectral_bandwidth...")
-            spectral_bandwidth = librosa.feature.spectral_bandwidth(S=S, sr=fs)
-            print(f"spectral_bandwidth shape: {spectral_bandwidth.shape}")
-            features['spectral_bandwidth'] = np.mean(spectral_bandwidth) if spectral_bandwidth.size > 0 else 0
-            
-            print("Extracting spectral_flatness...")
-            spectral_flatness = librosa.feature.spectral_flatness(S=S)
-            print(f"spectral_flatness shape: {spectral_flatness.shape}")
-            features['spectral_flatness'] = np.mean(spectral_flatness) if spectral_flatness.size > 0 else 0
-            
-            print("Extracting spectral_rolloff...")
-            spectral_rolloff = librosa.feature.spectral_rolloff(S=S, sr=fs)
-            print(f"spectral_rolloff shape: {spectral_rolloff.shape}")
-            features['spectral_rolloff'] = np.mean(spectral_rolloff) if spectral_rolloff.size > 0 else 0
-            
-            print("Calculating variance_of_spectrogram...")
+            features['spectral_centroid'] = np.mean(librosa.feature.spectral_centroid(S=S, sr=fs))
+            features['spectral_bandwidth'] = np.mean(librosa.feature.spectral_bandwidth(S=S, sr=fs))
+            features['spectral_flatness'] = np.mean(librosa.feature.spectral_flatness(S=S))
+            features['spectral_rolloff'] = np.mean(librosa.feature.spectral_rolloff(S=S, sr=fs))
             features['variance_of_spectrogram'] = np.var(S)
-            
-            print("Extracting rms_of_energy...")
-            rms_of_energy = librosa.feature.rms(S=S, frame_length=n_fft)
-            print(f"rms_of_energy shape: {rms_of_energy.shape}")
-            features['rms_of_energy'] = np.mean(rms_of_energy) if rms_of_energy.size > 0 else 0
-            
-            print("Extracting zero_crossing_rate...")
-            zero_crossing_rate = np.mean(librosa.feature.zero_crossing_rate(signal))
-            features['zero_crossing_rate'] = zero_crossing_rate
-
+            features['rms_of_energy'] = np.mean(librosa.feature.rms(S=S, frame_length=n_fft))
+            features['zero_crossing_rate'] = np.mean(librosa.feature.zero_crossing_rate(signal))
         except Exception as e:
             print(f"Error computing features: {e}")
-            # Features dictionary already initialized with default values
-    else:
-        print("Spectrogram is empty or contains NaN values. Using default feature values.")
-    
     return features
 
-def process_files(file1, file2):
-    """Process a pair of files to extract and pair features."""
+def process_files(file1, file2, window_length, hop_length):
+    """Process a pair of files to extract features for each window segment."""
     try:
         data1 = pd.read_parquet(file1).to_numpy()
         data2 = pd.read_parquet(file2).to_numpy()
-        print(f"Data1 shape after loading: {data1.shape}")  # Diagnostic print
-        print(f"Data2 shape after loading: {data2.shape}")  # Diagnostic print
-        # Compress channels for the first file if it has more than one channel
         if data1.shape[1] > 1:
             data1 = compress_channels(data1)
-        fs1, fs2 = 100000, 2000000  # Sampling rates for the files
-        features1 = extract_features(data1, fs1)
-        features2 = extract_features(data2, fs2)
-        return features1, features2
+        num_segments = min(len(data1), len(data2)) // hop_length
+        fs1, fs2 = 100000, 2000000
+        features_list = []
+        for i in range(num_segments):
+            start_idx = i * hop_length
+            end_idx = start_idx + window_length
+            if end_idx > min(len(data1), len(data2)):
+                break
+            segment1 = data1[start_idx:end_idx]
+            segment2 = data2[start_idx:end_idx]
+            segment_features1 = extract_features(segment1, fs1, i+1)
+            segment_features2 = extract_features(segment2, fs2, i+1)
+            combined_features = {
+                'subfolder_name': Path(file1).parent.name,
+                'AEKi_features': segment_features1,
+                'IRMS_features': segment_features2
+            }
+            features_list.append(combined_features)
+        return features_list
     except Exception as e:
         print(f"Error processing files {file1} and {file2}: {e}")
-        return None, None
+        return None
 
-def process_directory(top_directory):
+def process_directory(top_directory, window_length, hop_length):
     start_time = time.time()
     results = []
     corrupted_folders = []
-
     for root, dirs, files in os.walk(top_directory):
         if 'raw' in dirs:
             raw_path = os.path.join(root, 'raw')
             parquet_files = [f for f in os.listdir(raw_path) if f.endswith('.parquet')]
             if len(parquet_files) == 2:
                 file1, file2 = [os.path.join(raw_path, f) for f in parquet_files]
-                features1, features2 = process_files(file1, file2)
-                if features1 and features2:
-                    subfolder_name = Path(root).name
-                    results.append((subfolder_name, features1, features2))
+                segment_features = process_files(file1, file2, window_length, hop_length)
+                if segment_features:
+                    results.extend(segment_features)
                 else:
                     corrupted_folders.append(Path(root).name)
-
     runtime = time.time() - start_time
     print(f"Processing completed in {runtime} seconds.")
     return results, corrupted_folders
 
 # Example usage
-top_directory = 'Data/NOK_Measurements'
-results, corrupted_folders = process_directory(top_directory)
+top_directory = 'Test_202402-6'
+window_length = 1024  # Example window length
+hop_length = 512  # Example hop length
+results, corrupted_folders = process_directory(top_directory, window_length, hop_length)
 
 # Writing results to JSON
 output_filename = f"{top_directory}.json"
 with open(output_filename, 'w') as outfile:
-    json.dump({'results': results, 'corrupted_folders': corrupted_folders}, outfile)
+    json.dump({'results': results, 'corrupted_folders': corrupted_folders}, outfile, indent=4)
 
 print(f"Results and corrupted folder names written to {output_filename}.")
