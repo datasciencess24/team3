@@ -1,3 +1,5 @@
+# Gaussian Mixture Model
+
 import numpy as np
 from sklearn.mixture import GaussianMixture
 from sklearn.model_selection import KFold
