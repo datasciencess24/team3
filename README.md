@@ -4,35 +4,25 @@
 
 ## Overview
 
-- This is our explainable fusion model for grinding anomaly detection.<br>
-- It allows for observed anomalies to be more easily linked to their root causes in real time, striking the ideal balance between accuracy, interpretability and efficiency.<br>
-- It comprises a convolutional neural network (CNN) and decision tree (DT).<br>
-- Our experiments demonstrate that this fusion model performs significantly better than other explainable alternatives, namely a parallel CNN-DT fusion model, CNN with heat map, DT used alone and regularised logistic regression.
+- This is our Gaussian Mixture Model (GMM) for grinding anomaly detection.<br>
+- It boasts a perfect F2-score on clean and noisy samples between 70 and 2000 in size, hence being provably useful for smaller datasets.
+- By extracting only a select few features from the raw time-series data, it both achieves speed and allows for observed anomalies to be more easily linked to their root causes in real time, striking the ideal balance between accuracy, interpretability and efficiency.<br>
+- Our experiments demonstrate that this GMM performs significantly better than other explainable ML alternatives under these low-data conditions, namely an isolation forest, a one-class support vector machine and an autoencoder.
 
 
 ## Structure
 
-**/Data Loader**  includes methods for loading and preprocessing data.
-- /Config.py: stores all the parameters, such as the model hyperparameters, training parameters and configuration parameters
-- /Data_Module.py: handles loading data for use in a PyTorch model. It includes functionalities for reading data from multiple files, concatenating them into a single DataFrame, and preparing them for training with a custom collate function
-- /Dataset.py: customized structure of the time series dataset
-- /data_preprocessing.py: handles the preprocessing of time series data using wavelet transformation and standardization. It includes functionalities for reading data, applying wavelet decomposition, standardizing the data, and converting it to a PyTorch Tensordataset
-
-
-**/Models** contains both of our models that will be trained and tested both jointly and separately. As this project is not yet complete, certain parameters are still to be determined, such as the dimensionality of output for the CNN and the depth of the DT.
-
-**/Trainer** includes all methods that are used to train the models.
-- /trainCNN.py: trains a Convolutional Neural Network (CNN) model on time series data using PyTorch; includes functionalities for training the model and saving the trained model
-
-**/Data** contains two folders, one containing normal ('OK') data and the other anomalous ('NOK') data.
-
-**main.py**: output will be a trained CNN model (if there is no pretrained CNN) stored with the name 'Timeseries_Conv_model_1.pkl' and the results of the DecisionTree classifier including F1-score, precision and recall
-
+- /tuple_loader.py: loads the data files grinding_ok_train.json and grinding_test.json
+- /gmm_for_tuples.py: code for the Gaussian Mixture Model (GMM)
+- /run_gmm.py: runs the GMM
+- /ae_for_tuples.py, /if_for_tuples.py, /oc_svm_for_tuples.py: code for the comparison models, i.e. the autoencoder, Isolation Forest and one-class support vector machine respectively
+- /run_ae.py, /run_if.py, /run_oc_svm.py: code to run the three comparison models 
 
 ## Data
 
-The training data consists of 29 normal ('OK') and 29 anomalous ('NOK') datapoints, given in the data folder.
-Here we only uploaded part of the data as samples.
+This is stored in the same directory as the code, in two separate JSON files:
+- /grinding_ok_train.json: contains the flattened time-series data used for training; comprises 2000 recordings of normal grinding
+- /grinding_test.json: contains the flattened time-series data used for testing; comprises 29 recordings of normal grinding and 29 of simulated anomalies in grinding
 
 ## Project status
 
