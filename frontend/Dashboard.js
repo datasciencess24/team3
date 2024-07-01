@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", function () {
       } else {
         clearInterval(intervalId);
       }
-    }, 100);
+    }, 250);
   }
 
   function highlightButton(resolve) {
