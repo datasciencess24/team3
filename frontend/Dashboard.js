@@ -8,7 +8,13 @@ document.addEventListener("DOMContentLoaded", function () {
         {
           label: "Values",
           data: [],
-          backgroundColor: "rgba(54, 162, 235, 0.2)",
+          backgroundColor: "grey",
+          borderColor: "rgba(54, 162, 235, 1)",
+          borderWidth: 1,
+        },
+        {
+          label: "Anomalies",
+          backgroundColor: "red",
           borderColor: "rgba(54, 162, 235, 1)",
           borderWidth: 1,
         },
@@ -30,10 +36,12 @@ document.addEventListener("DOMContentLoaded", function () {
       },
       indexAxis: "x",
       barPercentage: 0.95,
-      categoryPercentage: 1.0,
+      categoryPercentage: 2.0,
     },
   });
 
+  // reads data from the givel localhost location, splits the given value into a list and calls
+  // the updateChart function with those values
   function fetchData(resolve) {
     fetch("http://localhost:8000/data/data.txt")
       .then((response) => response.text())
@@ -45,12 +53,17 @@ document.addEventListener("DOMContentLoaded", function () {
         resolve();
       })
       .catch((error) => {
-        console.error("Fehler beim Abrufen der Daten:", error);
-        alert("Fehler beim Abrufen der Daten. Bitte versuchen Sie es erneut.");
+        console.error("Error while fethcing data:", error);
+        alert(
+          "Error while fetching data. Please check your (local) server and try again."
+        );
         resolve();
       });
   }
 
+  // takes a list of values and iterates over it (every 250ms per element)
+  // it checks the value of every element; if it is bigger than a given value (5)
+  // it draws the value into a chart of the colour red, else grey
   function updateChart(values) {
     let index = 0;
     const backgroundColors = [];
@@ -82,10 +95,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 250);
   }
 
+  // sets the backroundColor value of the start-button element to grey for 200ms
   function highlightButton(resolve) {
     const button = document.querySelector(".start-button");
 
-    button.style.backgroundColor = "#dcdcdc";
+    button.style.backgroundColor = "grey";
 
     setTimeout(() => {
       button.style.backgroundColor = "#2196f3";
@@ -93,9 +107,9 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 200);
   }
 
+  // adds "Drilling in Progress" and "Anomaly-Detection is currently running" into the info-box element
   function starting(resolve) {
     const infoBox = document.querySelector(".info-box");
-
     const messages = [
       "Drilling in Progress",
       "Anomaly-Detection is currently running",
@@ -113,11 +127,7 @@ document.addEventListener("DOMContentLoaded", function () {
   document
     .querySelector(".start-button")
     .addEventListener("click", function () {
-      const messages = [
-        "Drilling in Progress",
-        "Anomaly-Detection is currently running",
-      ];
-
+      // starts highlight button and starting/fetchData in parallel
       Promise.all([
         new Promise((resolve, reject) => {
           highlightButton(resolve);
