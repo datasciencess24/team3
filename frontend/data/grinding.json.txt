@@ -1,0 +1,42 @@
+{
+  "2024.02.15_02.28.14_Grinding": {
+    "status": "anomalous",
+    "proportion_anomalous": 0.2830687830687831,
+    "percentile": 100,
+    "neg_log_likelihoods": [
+      -10.745500136037233,
+      -10.745500136037233,
+      -10.745500136037233
+    ]
+  },
+  "2024.02.15_02.27.48_Grinding": {
+    "status": "anomalous",
+    "proportion_anomalous": 0.2777777777777778,
+    "percentile": 100,
+    "neg_log_likelihoods": [
+      -10.745500136037233,
+      -10.745500136037233,
+      -10.745500136037233,
+      -10.745500136037233
+    ]
+  },
+  "2024.02.15_02.29 (1).09_Grinding": {
+    "status": "anomalous",
+    "proportion_anomalous": 0.29333333333333333,
+    "percentile": 100,
+    "neg_log_likelihoods": [
+      -10.745500136037233,
+      -10.745500136037233,
+      -10.745500136037233
+    ]
+  },
+  "2024.02.15_02.28 (1).41_Grinding": {
+    "status": "anomalous",
+    "proportion_anomalous": 0.28116710875331563,
+    "percentile": 100,
+    "neg_log_likelihoods": [
+      -10.745500136037233,
+      -10.745500136037233
+    ]
+  }
+}

@@ -107,11 +107,11 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 200);
   }
 
-  // adds "Drilling in Progress" and "Anomaly-Detection is currently running" into the info-box element
+  // adds "Grinding in Progress" and "Anomaly-Detection is currently running" into the info-box element
   function starting(resolve) {
     const infoBox = document.querySelector(".info-box");
     const messages = [
-      "Drilling in Progress",
+      "Grinding in Progress",
       "Anomaly-Detection is currently running",
     ];
 
