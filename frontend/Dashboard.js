@@ -9,14 +9,6 @@ document.addEventListener("DOMContentLoaded", function () {
           label: "Values",
           data: [],
           backgroundColor: "grey",
-          borderColor: "rgba(54, 162, 235, 1)",
-          borderWidth: 1,
-        },
-        {
-          label: "Anomalies",
-          backgroundColor: "red",
-          borderColor: "rgba(54, 162, 235, 1)",
-          borderWidth: 1,
         },
       ],
     },
@@ -35,80 +27,92 @@ document.addEventListener("DOMContentLoaded", function () {
         },
       },
       indexAxis: "x",
-      barPercentage: 0.95,
-      categoryPercentage: 2.0,
+      barPercentage: 0.99,
+      categoryPercentage: 1.0,
     },
   });
 
   // reads data from the givel localhost location, splits the given value into a list and calls
   // the updateChart function with those values
-  function fetchData(resolve) {
-    fetch("http://localhost:8000/data/data.txt")
-      .then((response) => response.text())
-      .then((data) => {
-        const values = data
-          .split(",")
-          .map((value) => parseInt(value.trim(), 10));
-        updateChart(values);
-        resolve();
-      })
-      .catch((error) => {
-        console.error("Error while fethcing data:", error);
-        alert(
-          "Error while fetching data. Please check your (local) server and try again."
-        );
-        resolve();
-      });
+  async function fetchData() {
+    try {
+      const response = await fetch("http://localhost:8000/data/data.json");
+      if (!response.ok) {
+        throw new Error("Failed to fetch data");
+      }
+      const data = await response.json();
+
+      const valuesList = Object.keys(data).map(
+        (key) => data[key].neg_log_likelihoods
+      );
+
+      for (let i = 0; i < valuesList.length; i++) {
+        console.log("i= " + i);
+        await updateChart(valuesList[i]);
+        console.log("another i = " + i);
+      }
+
+      console.log("All charts updated successfully");
+    } catch (error) {
+      console.error("Error while fetching data:", error);
+      alert(
+        "Error while fetching data. Please check your (local) server and try again."
+      );
+    }
   }
 
   // takes a list of values and iterates over it (every 250ms per element)
   // it checks the value of every element; if it is bigger than a given value (5)
   // it draws the value into a chart of the colour red, else grey
-  function updateChart(values) {
-    let index = 0;
-    const backgroundColors = [];
+  async function updateChart(values) {
+    return new Promise((resolve, reject) => {
+      resetChart();
+      starting();
+      let index = 0;
+      const backgroundColors = [];
 
-    const intervalId = setInterval(() => {
-      if (index < values.length) {
-        barChart.data.labels.push(index + 1);
+      const intervalId = setInterval(() => {
+        if (index < values.length) {
+          barChart.data.labels.push(index + 1);
 
-        if (values[index] > 5) {
-          backgroundColors.push("red");
-          const anomalyText = document.createElement("div");
-          anomalyText.classList.add("warning");
-          anomalyText.textContent = `Index ${index} shows a potential anomaly`;
+          if (values[index] > 5) {
+            backgroundColors.push("red");
+            const anomalyText = document.createElement("div");
+            anomalyText.classList.add("warning");
+            anomalyText.textContent = `Index ${index} shows a potential anomaly`;
 
-          const infoBox = document.querySelector(".info-box");
-          infoBox.appendChild(anomalyText);
-          infoBox.scrollTop = infoBox.scrollHeight;
+            const infoBox = document.querySelector(".info-box");
+            infoBox.appendChild(anomalyText);
+            infoBox.scrollTop = infoBox.scrollHeight;
+          } else {
+            backgroundColors.push("grey");
+          }
+
+          barChart.data.datasets[0].data.push(values[index]);
+          barChart.data.datasets[0].backgroundColor = backgroundColors;
+          barChart.update();
+          index++;
         } else {
-          backgroundColors.push("grey");
+          clearInterval(intervalId);
+          resolve();
         }
-
-        barChart.data.datasets[0].data.push(values[index]);
-        barChart.data.datasets[0].backgroundColor = backgroundColors;
-        barChart.update();
-        index++;
-      } else {
-        clearInterval(intervalId);
-      }
-    }, 250);
+      }, 10);
+    });
   }
 
   // sets the backroundColor value of the start-button element to grey for 200ms
-  function highlightButton(resolve) {
+  function highlightButton() {
     const button = document.querySelector(".start-button");
 
     button.style.backgroundColor = "grey";
 
     setTimeout(() => {
       button.style.backgroundColor = "#2196f3";
-      resolve();
     }, 200);
   }
 
   // adds "Grinding in Progress" and "Anomaly-Detection is currently running" into the info-box element
-  function starting(resolve) {
+  function starting() {
     const infoBox = document.querySelector(".info-box");
     const messages = [
       "Grinding in Progress",
@@ -124,27 +128,17 @@ document.addEventListener("DOMContentLoaded", function () {
     infoBox.scrollTop = infoBox.scrollHeight;
   }
 
+  function resetChart() {
+    barChart.data.labels = [];
+    barChart.data.datasets[0].data = [];
+    barChart.data.datasets[0].backgroundColor = [];
+    barChart.update();
+  }
+
   document
     .querySelector(".start-button")
     .addEventListener("click", function () {
-      // starts highlight button and starting/fetchData in parallel
-      Promise.all([
-        new Promise((resolve, reject) => {
-          highlightButton(resolve);
-        }),
-        new Promise((resolve, reject) => {
-          starting(resolve);
-          fetchData(resolve);
-        }),
-      ])
-        .then(() => {
-          console.log("All good!");
-        })
-        .catch((error) => {
-          console.error(
-            "There was a problem while visualizing the data:",
-            error
-          );
-        });
+      highlightButton();
+      fetchData();
     });
 });
