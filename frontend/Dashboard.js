@@ -49,7 +49,6 @@ document.addEventListener("DOMContentLoaded", function () {
       for (let i = 0; i < valuesList.length; i++) {
         console.log("i= " + i);
         await updateChart(valuesList[i]);
-        console.log("another i = " + i);
       }
 
       console.log("All charts updated successfully");
@@ -96,7 +95,7 @@ document.addEventListener("DOMContentLoaded", function () {
           clearInterval(intervalId);
           resolve();
         }
-      }, 10);
+      }, 50);
     });
   }
 
