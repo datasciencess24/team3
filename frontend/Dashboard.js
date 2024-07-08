@@ -1,3 +1,6 @@
+let abortFlag = false;
+let current = 0;
+
 document.addEventListener("DOMContentLoaded", function () {
   const ctx = document.getElementById("barChart").getContext("2d");
   const barChart = new Chart(ctx, {
@@ -9,6 +12,11 @@ document.addEventListener("DOMContentLoaded", function () {
           label: "Values",
           data: [],
           backgroundColor: "grey",
+        },
+        {
+          label: "Potential anomalies",
+          data: [],
+          backgroundColor: "red",
         },
       ],
     },
@@ -28,7 +36,7 @@ document.addEventListener("DOMContentLoaded", function () {
       },
       indexAxis: "x",
       barPercentage: 0.99,
-      categoryPercentage: 1.0,
+      categoryPercentage: 2.0,
     },
   });
 
@@ -42,13 +50,54 @@ document.addEventListener("DOMContentLoaded", function () {
       }
       const data = await response.json();
 
+      const statusList = Object.keys(data).map((key) => data[key].status);
+
+      const proportionAnomalousList = Object.keys(data).map(
+        (key) => data[key].proportion_anomalous_in_percent
+      );
+
+      const percentileList = Object.keys(data).map(
+        (key) => data[key].percentile
+      );
+
       const valuesList = Object.keys(data).map(
         (key) => data[key].neg_log_likelihoods
       );
 
       for (let i = 0; i < valuesList.length; i++) {
-        console.log("i= " + i);
+        current = i + 1;
+        if (abortFlag) {
+          return;
+        }
+        console.log("i = " + i);
+        resetChart();
+        writeIntoInfoBox(
+          "Grinding-process " +
+            current +
+            " in progress. Monitoring starting time: " +
+            new Date()
+        );
         await updateChart(valuesList[i]);
+        if (abortFlag) {
+          return;
+        }
+
+        writeIntoInfoBox("Monitoring end time: " + new Date());
+        writeIntoInfoBox("Full process classification: " + statusList[i]);
+        writeIntoInfoBox(
+          "Proportion of segments that can be classified as (approximately) anomalous: " +
+            proportionAnomalousList[i].toFixed(2) +
+            "%"
+        );
+        writeIntoInfoBox(
+          "Proportion of normal data used for training that the current process exceeds with the number of its abnormal segments: " +
+            percentileList[i].toFixed(2) +
+            "%"
+        );
+
+        if (i < valuesList.length - 1) {
+          await showContinueDialog(i);
+        }
       }
 
       console.log("All charts updated successfully");
@@ -65,20 +114,26 @@ document.addEventListener("DOMContentLoaded", function () {
   // it draws the value into a chart of the colour red, else grey
   async function updateChart(values) {
     return new Promise((resolve, reject) => {
-      resetChart();
-      starting();
       let index = 0;
       const backgroundColors = [];
 
       const intervalId = setInterval(() => {
+        if (abortFlag) {
+          clearInterval(intervalId);
+          resolve();
+          return;
+        }
         if (index < values.length) {
-          barChart.data.labels.push(index + 1);
+          const xValue = (index + 1) * 0.05;
+          barChart.data.labels.push(xValue.toFixed(2));
 
           if (values[index] > 5) {
             backgroundColors.push("red");
             const anomalyText = document.createElement("div");
             anomalyText.classList.add("warning");
-            anomalyText.textContent = `Index ${index} shows a potential anomaly`;
+            anomalyText.textContent = `Timestamp ${((index + 1) * 0.05).toFixed(
+              2
+            )}s shows a potential anomaly!`;
 
             const infoBox = document.querySelector(".info-box");
             infoBox.appendChild(anomalyText);
@@ -110,20 +165,12 @@ document.addEventListener("DOMContentLoaded", function () {
     }, 200);
   }
 
-  // adds "Grinding in Progress" and "Anomaly-Detection is currently running" into the info-box element
-  function starting() {
+  // adds given text into the info-box element
+  function writeIntoInfoBox(text) {
     const infoBox = document.querySelector(".info-box");
-    const messages = [
-      "Grinding in Progress",
-      "Anomaly-Detection is currently running",
-    ];
-
-    messages.forEach((message) => {
-      const messageElement = document.createElement("div");
-      messageElement.textContent = message;
-      infoBox.appendChild(messageElement);
-    });
-
+    const messageElement = document.createElement("div");
+    messageElement.textContent = text;
+    infoBox.appendChild(messageElement);
     infoBox.scrollTop = infoBox.scrollHeight;
   }
 
@@ -134,10 +181,80 @@ document.addEventListener("DOMContentLoaded", function () {
     barChart.update();
   }
 
+  function showContinueDialog(i) {
+    return new Promise((resolve) => {
+      const dialog = document.createElement("div");
+      dialog.classList.add("modal");
+
+      const dialogContent = `
+        <div class="modal-content">
+          <p>Process ${i + 1} has finished. Do you want to continue?</p>
+          <button id="continue-button">Continue</button>
+          <button id="export-diagram-button">Export Diagram</button>
+        </div>
+      `;
+      dialog.innerHTML = dialogContent;
+      document.body.appendChild(dialog);
+
+      document
+        .getElementById("continue-button")
+        .addEventListener("click", () => {
+          document.body.removeChild(dialog);
+          resolve();
+        });
+
+      document.getElementById("export-diagram-button").addEventListener("click", () => {
+        exportChartAsPNG();
+      });
+    });
+  }
+
+  function exportChartAsPNG() {
+    const link = document.createElement("a");
+    link.href = ctx.canvas.toDataURL("image/png");
+    link.download = "chart of process " + current + ", " + new Date() + ".png";
+    link.click();
+  }
+
+  function exportLogAsTXT() {
+    const infoBox = document.querySelector(".info-box");
+    const logContent = Array.from(infoBox.childNodes)
+      .map((node) => node.textContent)
+      .join("\n");
+
+    const blob = new Blob([logContent], { type: "text/plain" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "log " + new Date() + ".txt";
+    link.click();
+  }
+
+  //Event listener for start-button
   document
     .querySelector(".start-button")
     .addEventListener("click", function () {
+      abortFlag = false;
       highlightButton();
       fetchData();
+    });
+
+  //Event listener for export-log-button
+  document
+    .querySelector(".export-log-button")
+    .addEventListener("click", function () {
+      exportLogAsTXT();
+    });
+
+  document
+    .querySelector(".abort-button")
+    .addEventListener("click", function () {
+      abortFlag = true;
+      writeIntoInfoBox("Aborted at: " + new Date());
+    });
+
+    document
+    .querySelector(".export-diagram-button")
+    .addEventListener("click", function () {
+      exportChartAsPNG();
     });
 });
