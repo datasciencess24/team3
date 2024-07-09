@@ -96,7 +96,15 @@ document.addEventListener("DOMContentLoaded", function () {
         );
 
         if (i < valuesList.length - 1) {
-          await showContinueDialog(i);
+          if (statusList[i] == "anomalous") {
+            console.log("anomalous");
+            await showWarningDialog();
+          } else {
+            await showContinueDialog(i);
+          }
+        }
+        if (abortFlag) {
+          return;
         }
       }
 
@@ -188,7 +196,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
       const dialogContent = `
         <div class="modal-content">
-          <p>Process ${i + 1} has finished. Do you want to continue?</p>
+          <p>Process ${i + 1} has finished without major complications.<br /> Do you want to continue?</p>
           <button id="continue-button">Continue</button>
           <button id="export-diagram-button">Export Diagram</button>
         </div>
@@ -203,15 +211,79 @@ document.addEventListener("DOMContentLoaded", function () {
           resolve();
         });
 
-      document.getElementById("export-diagram-button").addEventListener("click", () => {
-        exportChartAsPNG();
-      });
+      document
+        .getElementById("export-diagram-button")
+        .addEventListener("click", () => {
+          exportChartAsPNG();
+        });
     });
   }
 
+  function showWarningDialog() {
+    return new Promise((resolve) => {
+      const dialog = document.createElement("div");
+      dialog.classList.add("modal");
+
+      const dialogContent = `
+        <div class="modal-content">
+          <p><span style="font-weight: bold; color: red;">Warning this process seems to be anomalous!</span><br/>
+          It is recommended to keep the diagram and the log and to stop further runs for the time being!</p>
+          <button id="continue-button">Continue</button>
+          <button id="export-diagram-button">Export</button>
+          <button id="abort-button">Abort</button>
+        </div>
+      `;
+      dialog.innerHTML = dialogContent;
+      document.body.appendChild(dialog);
+
+      document
+        .getElementById("continue-button")
+        .addEventListener("click", () => {
+          document.body.removeChild(dialog);
+          resolve();
+        });
+
+      document
+        .getElementById("export-diagram-button")
+        .addEventListener("click", () => {
+          exportChartAsPNG();
+          exportLogAsTXT();
+        });
+
+      document.getElementById("abort-button").addEventListener("click", () => {
+        document.body.removeChild(dialog);
+        abortFlag = true;
+        writeIntoInfoBox("Aborted at: " + new Date());
+        resolve();
+      });
+    });
+  }
+/*
+  // black backround
   function exportChartAsPNG() {
     const link = document.createElement("a");
     link.href = ctx.canvas.toDataURL("image/png");
+    link.download = "chart of process " + current + ", " + new Date() + ".png";
+    link.click();
+  }
+    */
+
+  function exportChartAsPNG() {
+    const canvas = document.getElementById('barChart');
+    const ctx = canvas.getContext('2d');
+  
+    const tempCanvas = document.createElement('canvas');
+    const tempCtx = tempCanvas.getContext('2d');
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height;
+  
+    tempCtx.fillStyle = 'white';
+    tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+  
+    tempCtx.drawImage(canvas, 0, 0);
+  
+    const link = document.createElement('a');
+    link.href = tempCanvas.toDataURL('image/png');
     link.download = "chart of process " + current + ", " + new Date() + ".png";
     link.click();
   }
@@ -252,7 +324,7 @@ document.addEventListener("DOMContentLoaded", function () {
       writeIntoInfoBox("Aborted at: " + new Date());
     });
 
-    document
+  document
     .querySelector(".export-diagram-button")
     .addEventListener("click", function () {
       exportChartAsPNG();
