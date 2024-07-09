@@ -44,7 +44,8 @@ document.addEventListener("DOMContentLoaded", function () {
   // the updateChart function with those values
   async function fetchData() {
     try {
-      const response = await fetch("http://localhost:8000/data/data.json");
+      //random parameter to bypass cache
+      const response = await fetch(`http://localhost:8000/data/data.json?nocache=${new Date().getTime()}`);
       if (!response.ok) {
         throw new Error("Failed to fetch data");
       }
