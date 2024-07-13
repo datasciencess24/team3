@@ -98,7 +98,7 @@ document.addEventListener("DOMContentLoaded", function () {
             "% of normal training data"
         );
 
-        if (i < valuesList.length - 1) {
+        if (i < valuesList.length) {
           exportChartAsPNG();
           if (statusList[i] == "anomalous") {
             console.log("anomalous");
