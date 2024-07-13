@@ -118,7 +118,7 @@ document.addEventListener("DOMContentLoaded", function () {
           return;
         }
       }
-
+      writeIntoInfoBox("Entire sequence completed!")
       console.log("All charts updated successfully");
     } catch (error) {
       console.error("Error while fetching data:", error);
