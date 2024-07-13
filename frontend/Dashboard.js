@@ -21,6 +21,9 @@ document.addEventListener("DOMContentLoaded", function () {
       ],
     },
     options: {
+      animation: /* false,*/ {
+        duration: 40
+      },
       scales: {
         y: {
           beginAtZero: true,
