@@ -169,7 +169,7 @@ document.addEventListener("DOMContentLoaded", function () {
           clearInterval(intervalId);
           resolve();
         }
-      }, 10);
+      }, 50);
     });
   }
 
