@@ -45,7 +45,9 @@ document.addEventListener("DOMContentLoaded", function () {
   async function fetchData() {
     try {
       //random parameter to bypass cache
-      const response = await fetch(`http://localhost:8000/data/data.json?nocache=${new Date().getTime()}`);
+      const response = await fetch(
+        `http://localhost:8000/data/data.json?nocache=${new Date().getTime()}`
+      );
       if (!response.ok) {
         throw new Error("Failed to fetch data");
       }
@@ -86,23 +88,28 @@ document.addEventListener("DOMContentLoaded", function () {
         writeIntoInfoBox("Monitoring end time: " + new Date());
         writeIntoInfoBox("Full process classification: " + statusList[i]);
         writeIntoInfoBox(
-          "Proportion of segments that can be classified as (approximately) anomalous: " +
+          "Proportion of potentially anomalous segments: " +
             proportionAnomalousList[i].toFixed(2) +
             "%"
         );
         writeIntoInfoBox(
-          "Proportion of normal data used for training that the current process exceeds with the number of its abnormal segments: " +
+          "Current process has more abnormal segments than " +
             percentileList[i].toFixed(2) +
-            "%"
+            "% of normal training data"
         );
 
         if (i < valuesList.length - 1) {
+          exportChartAsPNG();
           if (statusList[i] == "anomalous") {
             console.log("anomalous");
+            exportLogAsTXT();
             await showWarningDialog();
-          } else {
+          } 
+          /*
+          else {
             await showContinueDialog(i);
           }
+            */
         }
         if (abortFlag) {
           return;
@@ -159,7 +166,7 @@ document.addEventListener("DOMContentLoaded", function () {
           clearInterval(intervalId);
           resolve();
         }
-      }, 50);
+      }, 10);
     });
   }
 
@@ -190,6 +197,7 @@ document.addEventListener("DOMContentLoaded", function () {
     barChart.update();
   }
 
+  /*
   function showContinueDialog(i) {
     return new Promise((resolve) => {
       const dialog = document.createElement("div");
@@ -219,6 +227,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
   }
+    */
 
   function showWarningDialog() {
     return new Promise((resolve) => {
@@ -228,9 +237,9 @@ document.addEventListener("DOMContentLoaded", function () {
       const dialogContent = `
         <div class="modal-content">
           <p><span style="font-weight: bold; color: red;">Warning this process seems to be anomalous!</span><br/>
-          It is recommended to keep the diagram and the log and to stop further runs for the time being!</p>
+          The current diagram and info-log are exported automatically.<br/>
+          It is recommended to keep the diagram and the log and to abort further runs for the time being!</p>
           <button id="continue-button">Continue</button>
-          <button id="export-diagram-button">Export</button>
           <button id="abort-button">Abort</button>
         </div>
       `;
@@ -244,12 +253,14 @@ document.addEventListener("DOMContentLoaded", function () {
           resolve();
         });
 
+        /*
       document
         .getElementById("export-diagram-button")
         .addEventListener("click", () => {
           exportChartAsPNG();
           exportLogAsTXT();
         });
+      */
 
       document.getElementById("abort-button").addEventListener("click", () => {
         document.body.removeChild(dialog);
@@ -259,7 +270,7 @@ document.addEventListener("DOMContentLoaded", function () {
       });
     });
   }
-/*
+  /*
   // black backround
   function exportChartAsPNG() {
     const link = document.createElement("a");
@@ -270,21 +281,21 @@ document.addEventListener("DOMContentLoaded", function () {
     */
 
   function exportChartAsPNG() {
-    const canvas = document.getElementById('barChart');
-    const ctx = canvas.getContext('2d');
-  
-    const tempCanvas = document.createElement('canvas');
-    const tempCtx = tempCanvas.getContext('2d');
+    const canvas = document.getElementById("barChart");
+    const ctx = canvas.getContext("2d");
+
+    const tempCanvas = document.createElement("canvas");
+    const tempCtx = tempCanvas.getContext("2d");
     tempCanvas.width = canvas.width;
     tempCanvas.height = canvas.height;
-  
-    tempCtx.fillStyle = 'white';
+
+    tempCtx.fillStyle = "white";
     tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
-  
+
     tempCtx.drawImage(canvas, 0, 0);
-  
-    const link = document.createElement('a');
-    link.href = tempCanvas.toDataURL('image/png');
+
+    const link = document.createElement("a");
+    link.href = tempCanvas.toDataURL("image/png");
     link.download = "chart of process " + current + ", " + new Date() + ".png";
     link.click();
   }
