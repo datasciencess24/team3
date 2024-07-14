@@ -1,0 +1,5 @@
+to start a local (python) server:
+1) navigate to the frontend folder
+2) python cors_http_server.py
+
+--> the root of localhost will be the frontend folder
