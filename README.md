@@ -12,6 +12,7 @@
 
 ## Structure
 
+- /frontend: contains the necessary files of the dashboard. The data is read from frontend/data/data. a local python server must be running via cors_http_server.py to access the data. Open Dashboard.html for the UI
 - /tuple_loader.py: loads the data files grinding_ok_train.json and grinding_test.json
 - /gmm_for_tuples.py: code for the Gaussian Mixture Model (GMM)
 - /run_gmm.py: runs the GMM
