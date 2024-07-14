@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="Dashboard.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="overview">Process-Overview</div>
+      <div class="graph-and-info-box">
+        <div class="graph-box">
+          <canvas id="barChart"></canvas>
+        </div>
+        <div class="info-box">
+          <div class="info">Info-Log</div>
+        </div>
+      </div>
+      <button class="start-button">Start</button>
+      <br />
+      <button class="export-diagram-button">Export Current Diagram</button>
+      <br />
+      <button class="export-log-button">Export Log</button>
+      <br />
+      <button class="abort-button">Abort</button>
+    </div>
+    <script defer src="Dashboard.js"></script>
+  </body>
+</html>
