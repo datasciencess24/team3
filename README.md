@@ -12,11 +12,12 @@
 
 ## Structure
 - /cae_gmm_140724: 
--- /DataLoader.py:  Loads data from files
--- /data_preprocessing.py: Handles the preprocessing of the time series data through sampling, standardization and segmentation
--- /Model.py: Contain the model Convolutional Autoencoder and Gaussian Mixture Model(GMM)
--- /train.py: train the model on time series data using PyTorch. It includes functionalities for training the model, and saving the trained model.
--- /main.py: output will be a trained CAE-GMM model(if there is no pretrained model),the proportions of anomalous data detected in the training set, two separate JSON files containing normal and anomalous results after the anomaly detection.
+- **/DataLoader.py:**  Loads data from files
+- **/data_preprocessing.py:** Handles the preprocessing of the time series data through sampling, standardization and segmentation
+- **/Model.py:** Contain the model Convolutional Autoencoder and Gaussian Mixture Model(GMM)
+- **/train.py:** train the model on time series data using PyTorch. It includes functionalities for training the model, and saving the trained model.
+- **/main.py:** output will be a trained CAE-GMM model(if there is no pretrained model),the proportions of anomalous data detected in the training set, two separate JSON files containing normal and anomalous results after the anomaly detection.
+
 For both training and test data, the code a directory structure where training files are located within subdirectories named ‘raw’ (or containing ‘raw’ in their path), potentially among other directories. It specifically looks for two types of parquet files within these raw directories:
 - 1. A file named ‘Sampling2000KHz_AEKi-0.parquet’ for acoustic emissions (AE) data.
 - 2. A file named ‘Sampling100KHz_Irms_Grinding-Grinding spindle current L1-Grinding spindle current L2-Grinding spindle current L3-0.parquet’ for electrical current (EC) data.
